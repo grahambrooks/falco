@@ -1,0 +1,5 @@
+.idea/
+bazel-bin
+bazel-falco
+bazel-out
+bazel-testlogs
