@@ -30,3 +30,20 @@ func main() {
 
 	//antlr.ParseTreeWalkerDefault.Walk(&jenkinsListener{}, p.Start())
 }
+
+func ParseJenkinsFile(filename string) (IStartContext, error) {
+	is, err:= antlr.NewFileStream(filename)
+
+	if err != nil {
+		return nil, err
+	}
+
+	// Create the Lexer
+	lexer := NewjenkinsLexer(is)
+
+	stream := antlr.NewCommonTokenStream(lexer, antlr.TokenDefaultChannel)
+
+	p := NewjenkinsParser(stream)
+
+	return  p.Start(), nil
+}

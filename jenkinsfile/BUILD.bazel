@@ -15,7 +15,6 @@ go_library(
         ":jenkins",
     ],
     deps = [
-        "//grammar:go_default_library",
         "@com_github_antlr_antlr4//runtime/Go/antlr:go_default_library",
     ],
     importpath = "github.com/grahambrooks/falco",
@@ -24,9 +23,10 @@ go_library(
 
 go_test(
     name = "go_default_test",
-    srcs = [],
+    srcs = ["parsing_test.go"],
     embed = [":go_default_library"],
     deps = ["@com_github_stretchr_testify//assert:go_default_library"],
+    data = glob(["testdata/**"]),
 )
 
 go_binary(
