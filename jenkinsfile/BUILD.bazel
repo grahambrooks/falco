@@ -3,7 +3,7 @@ load("@rules_antlr//antlr:antlr4.bzl", antlr4 = "antlr")
 
 antlr4(
     name = "jenkins",
-    srcs = ["grammar/jenkins.g4"],
+    srcs = ["grammar/Jenkins.g4"],
     language = "Go",
     package = "main",
 )

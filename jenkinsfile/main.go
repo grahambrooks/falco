@@ -7,43 +7,79 @@ import (
 
 func main() {
 	fmt.Printf("jenkinsfile")
-	// Setup the input
-	is := antlr.NewInputStream("@Library('my-shared-library') _")
+}
 
-	// Create the Lexer
-	lexer := NewjenkinsLexer(is)
+type jenkinsListener struct {
+	*BaseJenkinsListener
+}
 
-	stream := antlr.NewCommonTokenStream(lexer, antlr.TokenDefaultChannel)
+func (jenkinsListener) VisitErrorNode(node antlr.ErrorNode) {
+	fmt.Printf("Visiting error node %v\n", node)
+}
 
-	// Create the Parser
-	p := NewjenkinsParser(stream)
+func (s *jenkinsListener) EnterLibrary_ref(ctx *Library_refContext) {
+	fmt.Println("Enter lib ref")
+}
 
+// ExitLibrary_ref is called when production library_ref is exited.
+func (s *jenkinsListener) ExitLibrary_ref(ctx *Library_refContext) {
+	fmt.Println("Exit lib ref")
+}
 
-	context := p.Start()
+type JenkinsfileErrorStrategy struct {
+	*antlr.ErrorStrategy
+	ErrorCount int
+}
 
-	fmt.Printf("Parser response %#v\n", context)
+func (j *JenkinsfileErrorStrategy) reset(antlr.Parser) {
+	panic("implement me")
+}
 
-	fmt.Printf("Library reference %s\n", context.GetRef().GetLib().GetText())
+func (j *JenkinsfileErrorStrategy) RecoverInline(antlr.Parser) antlr.Token {
+	panic("implement me")
+}
 
+func (j *JenkinsfileErrorStrategy) Recover(antlr.Parser, antlr.RecognitionException) {
+	panic("implement me")
+}
 
-	// Finally parse the expression
+func (j *JenkinsfileErrorStrategy) Sync(antlr.Parser) {
+	panic("implement me")
+}
 
-	//antlr.ParseTreeWalkerDefault.Walk(&jenkinsListener{}, p.Start())
+func (j *JenkinsfileErrorStrategy) inErrorRecoveryMode(antlr.Parser) bool {
+	panic("implement me")
+}
+
+func (j *JenkinsfileErrorStrategy) ReportMatch(antlr.Parser) {
+	panic("implement me")
+}
+
+func (j *JenkinsfileErrorStrategy) ReportError(parser antlr.Parser, e antlr.RecognitionException) {
+	j.ErrorStrategy.ReportError(parser, e)
+	j.ErrorCount++
+}
+
+func (j *JenkinsfileErrorStrategy) Errors() error {
+	if j.ErrorCount > 0 {
+		return fmt.Errorf("%d errors encountered during parsing", j.ErrorCount)
+	}
+	return nil
 }
 
 func ParseJenkinsFile(filename string) (IStartContext, error) {
-	is, err:= antlr.NewFileStream(filename)
+	is, err := antlr.NewFileStream(filename)
 
 	if err != nil {
 		return nil, err
 	}
 
 	// Create the Lexer
-	lexer := NewjenkinsLexer(is)
+	lexer := NewJenkinsLexer(is)
 
 	stream := antlr.NewCommonTokenStream(lexer, antlr.TokenDefaultChannel)
 
-	p := NewjenkinsParser(stream)
+	p := NewJenkinsParser(stream)
 
-	return  p.Start(), nil
+	return p.Start(), strategy.Errors()
 }
